@@ -14,6 +14,9 @@ class ViewController: UIViewController {
         didSet {
             if isBlack {
                 self.view.backgroundColor = .black
+                self.changeColorButton.tintColor = .white
+                self.startBruteForceButton.tintColor = .white
+                self.resetButton.tintColor = .white
             } else {
                 self.view.backgroundColor = .white
             }
@@ -23,38 +26,69 @@ class ViewController: UIViewController {
     //MARK: - Outlets
     
     private lazy var changeColorButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton(type: .system)
+        button.backgroundColor = .systemBlue
+        button.setTitle("Change Color", for: .normal)
+        button.tintColor = .white
+        button.layer.cornerRadius = 25
         
         button.addTarget(self, action: #selector(onBut(_:)), for: .touchUpInside)
         return button
     }()
     
-    private lazy var anotherOneButton: UIButton = {
-        let button = UIButton()
-         
-//         button.addTarget(self, action: #selector(onBut(_:)), for: .touchUpInside)
-         return button
-     }()
+    private lazy var startBruteForceButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = .systemBlue
+        button.setTitle("Start", for: .normal)
+        button.tintColor = .white
+        button.layer.cornerRadius = 25
+        
+        button.addTarget(self, action: #selector(generatePassword), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var resetButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = .systemBlue
+        button.setTitle("Reset", for: .normal)
+        button.tintColor = .white
+        button.layer.cornerRadius = 25
+        
+        //         button.addTarget(self, action: #selector(onBut(_:)), for: .touchUpInside)
+        return button
+    }()
     
     private lazy var textField: UITextField = {
-       let textField = UITextField()
+        let textField = UITextField()
+        textField.isSecureTextEntry = true
+        textField.placeholder = "Helloooosdofdsof"
+        textField.layer.borderWidth = 0.5
+        textField.layer.cornerRadius = 20
         return textField
     }()
     
     private lazy var label: UILabel = {
         let label = UILabel()
+        label.text = "Password"
+        label.textColor = .black
+        label.font = UIFont.systemFont(ofSize: 20)
+        label.textAlignment = .center
         return label
     }()
     
-    //MARK: - Button Actions
+    //MARK: - Buttons Actions
     
     @objc private func onBut(_ sender: Any) {
         isBlack.toggle()
     }
     
- //MARK: - BruteForce methods
+    @objc private func generatePassword() {
+        textField.text = generateBruteForce(<#T##string: String##String#>, fromArray: <#T##[String]#>)
+    }
     
-    func bruteForce(passwordToUnlock: String) {
+    //MARK: - BruteForce methods
+    
+   private func bruteForce(passwordToUnlock: String) {
         let ALLOWED_CHARACTERS: [String] = String().printable.map { String($0) }
         
         var password: String = ""
@@ -70,15 +104,15 @@ class ViewController: UIViewController {
         print(password)
     }
     
-    func indexOf(character: Character, _ array: [String]) -> Int {
+    private func indexOf(character: Character, _ array: [String]) -> Int {
         return array.firstIndex(of: String(character))!
     }
-
-    func characterAt(index: Int, _ array: [String]) -> Character {
+    
+    private func characterAt(index: Int, _ array: [String]) -> Character {
         return index < array.count ? Character(array[index]) : Character("")
     }
-
-    func generateBruteForce(_ string: String, fromArray array: [String]) -> String {
+    
+    private func generateBruteForce(_ string: String, fromArray array: [String]) -> String {
         var str: String = string
         
         if str.count <= 0 {
@@ -95,27 +129,63 @@ class ViewController: UIViewController {
         
         return str
     }
-
+    
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         setupHierarchy()
         setupLayout()
-        self.bruteForce(passwordToUnlock: "1!gr")
+        //        self.bruteForce(passwordToUnlock: "1!gr")
     }
     
     //MARK: - Setup
     
     private func setupHierarchy() {
         view.addSubview(changeColorButton)
-        view.addSubview(anotherOneButton)
+        view.addSubview(startBruteForceButton)
+        view.addSubview(resetButton)
         view.addSubview(textField)
         view.addSubview(label)
     }
     
     private func setupLayout() {
         
+        textField.snp.makeConstraints { make in
+            make.centerY.equalTo(view.snp.centerY).offset(-150)
+            make.left.equalTo(view.snp.left).offset(20)
+            make.right.equalTo(view.snp.right).offset(-20)
+            make.height.equalTo(50)
+        }
+        
+        label.snp.makeConstraints { make in
+            make.centerY.equalTo(view.snp.centerY)
+            make.top.equalTo(textField.snp.bottom).offset(50)
+            make.left.equalTo(view.snp.left).offset(50)
+            make.right.equalTo(view.snp.right).offset(-50)
+        }
+        
+        changeColorButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.snp.bottom).offset(-20)
+            make.left.equalTo(view.snp.left).offset(20)
+            make.width.equalTo(100)
+            make.height.equalTo(50)
+        }
+        
+        startBruteForceButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.snp.bottom).offset(-20)
+            make.left.equalTo(changeColorButton.snp.right).offset(20)
+            make.width.equalTo(100)
+            make.height.equalTo(50)
+        }
+        
+        resetButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.snp.bottom).offset(-20)
+            make.left.equalTo(startBruteForceButton.snp.right).offset(20)
+            make.width.equalTo(100)
+            make.height.equalTo(50)
+        }
     }
 }
 
