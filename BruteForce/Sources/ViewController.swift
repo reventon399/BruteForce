@@ -20,9 +20,39 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func onBut(_ sender: Any) {
+    //MARK: - Outlets
+    
+    private lazy var changeColorButton: UIButton = {
+       let button = UIButton()
+        
+        button.addTarget(self, action: #selector(onBut(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var anotherOneButton: UIButton = {
+        let button = UIButton()
+         
+//         button.addTarget(self, action: #selector(onBut(_:)), for: .touchUpInside)
+         return button
+     }()
+    
+    private lazy var textField: UITextField = {
+       let textField = UITextField()
+        return textField
+    }()
+    
+    private lazy var label: UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
+    //MARK: - Button Actions
+    
+    @objc private func onBut(_ sender: Any) {
         isBlack.toggle()
     }
+    
+    //MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,25 +77,6 @@ class ViewController: UIViewController {
         }
         
         print(password)
-    }
-}
-
-
-
-extension String {
-    var digits:      String { return "0123456789" }
-    var lowercase:   String { return "abcdefghijklmnopqrstuvwxyz" }
-    var uppercase:   String { return "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
-    var punctuation: String { return "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" }
-    var letters:     String { return lowercase + uppercase }
-    var printable:   String { return digits + letters + punctuation }
-    
-    
-    
-    mutating func replace(at index: Int, with character: Character) {
-        var stringArray = Array(self)
-        stringArray[index] = character
-        self = String(stringArray)
     }
 }
 
