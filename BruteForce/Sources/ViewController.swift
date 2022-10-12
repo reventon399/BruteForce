@@ -10,15 +10,22 @@ import SnapKit
 
 class ViewController: UIViewController {
     
-    var isBlack: Bool = false {
+    //MARK: - Private properties
+    
+   private var isBlack: Bool = false {
         didSet {
             if isBlack {
                 self.view.backgroundColor = .black
+                self.label.textColor = .white
                 self.changeColorButton.tintColor = .white
                 self.startBruteForceButton.tintColor = .white
                 self.resetButton.tintColor = .white
             } else {
                 self.view.backgroundColor = .white
+                self.label.textColor = .black
+                self.changeColorButton.tintColor = .black
+                self.startBruteForceButton.tintColor = .black
+                self.resetButton.tintColor = .black
             }
         }
     }
@@ -27,10 +34,8 @@ class ViewController: UIViewController {
     
     private lazy var changeColorButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .systemBlue
         button.setTitle("Change Color", for: .normal)
-        button.tintColor = .white
-        button.layer.cornerRadius = 25
+        button.tintColor = .black
         
         button.addTarget(self, action: #selector(onBut(_:)), for: .touchUpInside)
         return button
@@ -38,30 +43,26 @@ class ViewController: UIViewController {
     
     private lazy var startBruteForceButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .systemBlue
         button.setTitle("Start", for: .normal)
-        button.tintColor = .white
-        button.layer.cornerRadius = 25
+        button.tintColor = .black
         
-        button.addTarget(self, action: #selector(generatePassword), for: .touchUpInside)
+        button.addTarget(self, action: #selector(startBruteForce), for: .touchUpInside)
         return button
     }()
     
     private lazy var resetButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .systemBlue
         button.setTitle("Reset", for: .normal)
-        button.tintColor = .white
-        button.layer.cornerRadius = 25
+        button.tintColor = .black
         
-        //         button.addTarget(self, action: #selector(onBut(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(resetButtonPressed), for: .touchUpInside)
         return button
     }()
     
     private lazy var textField: UITextField = {
         let textField = UITextField()
         textField.isSecureTextEntry = true
-        textField.placeholder = "Helloooosdofdsof"
+        textField.placeholder = "Type your password here"
         textField.layer.borderWidth = 0.5
         textField.layer.cornerRadius = 20
         return textField
@@ -69,11 +70,16 @@ class ViewController: UIViewController {
     
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = "Password"
+        label.text = "Let's hack your password"
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 20)
         label.textAlignment = .center
         return label
+    }()
+    
+    private lazy var passwordActivityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        return indicator
     }()
     
     //MARK: - Buttons Actions
@@ -82,8 +88,13 @@ class ViewController: UIViewController {
         isBlack.toggle()
     }
     
-    @objc private func generatePassword() {
-        textField.text = generateBruteForce(<#T##string: String##String#>, fromArray: <#T##[String]#>)
+    @objc private func startBruteForce() {
+
+    }
+    
+    @objc private func resetButtonPressed() {
+        textField.text = ""
+        label.text = "Let's hack your password"
     }
     
     //MARK: - BruteForce methods
@@ -137,7 +148,7 @@ class ViewController: UIViewController {
         view.backgroundColor = .white
         setupHierarchy()
         setupLayout()
-        //        self.bruteForce(passwordToUnlock: "1!gr")
+//                self.bruteForce(passwordToUnlock: "1!gr")
     }
     
     //MARK: - Setup
