@@ -89,12 +89,31 @@ class ViewController: UIViewController {
     }
     
     @objc private func startBruteForce() {
-
+        if textField.text == "" {
+            showEmptyTextFieldAlert()
+        } else {
+            guard let password = textField.text else { return }
+            bruteForce(passwordToUnlock: password)
+        }
     }
     
     @objc private func resetButtonPressed() {
         textField.text = ""
         label.text = "Let's hack your password"
+    }
+    
+    //MARK: - Alert methods
+    
+    func showEmptyTextFieldAlert() {
+        let alert = UIAlertController(
+            title: "Empty Text Field",
+            message: "Write your password in text field for correct working of this app",
+            preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { event in
+            
+        }))
+        self.present(alert, animated: true)
     }
     
     //MARK: - BruteForce methods
