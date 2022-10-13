@@ -12,7 +12,9 @@ class ViewController: UIViewController {
     
     //MARK: - Private properties
     
-   private var isBlack: Bool = false {
+    private var isBruteForceStarted = false
+    
+    private var isBlack: Bool = false {
         didSet {
             if isBlack {
                 self.view.backgroundColor = .black
@@ -47,6 +49,15 @@ class ViewController: UIViewController {
         button.tintColor = .black
         
         button.addTarget(self, action: #selector(startBruteForce), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var stopBruteForceButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Stop", for: .normal)
+        button.tintColor = .black
+        
+        button.addTarget(self, action: #selector(stopBruteForce), for: .touchUpInside)
         return button
     }()
     
@@ -90,30 +101,35 @@ class ViewController: UIViewController {
     }
     
     @objc private func startBruteForce() {
-        if textField.text == "" {
-            showEmptyTextFieldAlert()
-        } else {
-            guard let password = textField.text else { return }
-            let queue = DispatchQueue(
-                label: "bruteForce",
-                qos: .background
-            )
-            queue.async {
-                self.bruteForce(passwordToUnlock: password)
+            if textField.text == "" {
+                showEmptyTextFieldAlert()
+            } else {
+                guard let password = textField.text else { return }
+                let queue = DispatchQueue(
+                    label: "bruteForce",
+                    qos: .background
+                )
+                queue.async {
+                    self.bruteForce(passwordToUnlock: password)
+                }
+                passwordActivityIndicator.startAnimating()
+                passwordActivityIndicator.isHidden = false
             }
-            passwordActivityIndicator.startAnimating()
-            passwordActivityIndicator.isHidden = false
-        }
+    }
+    
+    @objc private func stopBruteForce() {
+        
     }
     
     @objc private func resetButtonPressed() {
+        isBruteForceStarted = false
         textField.text = ""
         label.text = "Let's hack your password"
     }
     
-    //MARK: - Alert methods
+    //MARK: - Alert
     
-    func showEmptyTextFieldAlert() {
+   private func showEmptyTextFieldAlert() {
         let alert = UIAlertController(
             title: "Empty Text Field",
             message: "Write your password in text field for correct working of this app",
@@ -128,19 +144,42 @@ class ViewController: UIViewController {
     //MARK: - BruteForce methods
     
    private func bruteForce(passwordToUnlock: String) {
-        let ALLOWED_CHARACTERS: [String] = String().printable.map { String($0) }
-        
+       
+        let allowedCharacters: [String] = String().printable.map { String($0) }
         var password: String = ""
-        
-        // Will strangely ends at 0000 instead of ~~~
-        while password != passwordToUnlock { // Increase MAXIMUM_PASSWORD_SIZE value for more
-            password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
-            //             Your stuff here
-            print(password)
-            // Your stuff here
-        }
-        
-        print(password)
+
+           while password != passwordToUnlock {
+               if isBruteForceStarted {
+                   DispatchQueue.main.async { [self] in
+                       changeInterface(password: textField.text ?? "", isHacked: false)
+                   }
+                   break
+               }
+               password = generateBruteForce(password, fromArray: allowedCharacters)
+               DispatchQueue.main.async { [self] in
+                   label.text = password
+               }
+           }
+       if !isBruteForceStarted {
+           DispatchQueue.main.async { [self] in
+               changeInterface(password: password, isHacked: true)
+           }
+       }
+    }
+    
+    private func changeInterface(password secretKey: String, isHacked: Bool) {
+        if isHacked {
+                  let successText = "Password is found:\n\(secretKey)"
+                  self.label.text = successText
+                  self.label.textColor = .systemGreen
+                  self.textField.isSecureTextEntry = false
+                  self.passwordActivityIndicator.isHidden = true
+                  self.passwordActivityIndicator.stopAnimating()
+              } else {
+                  let failureText = "Password \n\(secretKey)\n not hacked"
+                  self.label.text = failureText
+                  self.label.textColor = .systemRed
+              }
     }
     
     private func indexOf(character: Character, _ array: [String]) -> Int {
