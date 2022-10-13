@@ -79,6 +79,7 @@ class ViewController: UIViewController {
     
     private lazy var passwordActivityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.isHidden = true
         return indicator
     }()
     
@@ -93,7 +94,15 @@ class ViewController: UIViewController {
             showEmptyTextFieldAlert()
         } else {
             guard let password = textField.text else { return }
-            bruteForce(passwordToUnlock: password)
+            let queue = DispatchQueue(
+                label: "bruteForce",
+                qos: .background
+            )
+            queue.async {
+                self.bruteForce(passwordToUnlock: password)
+            }
+            passwordActivityIndicator.startAnimating()
+            passwordActivityIndicator.isHidden = false
         }
     }
     
@@ -167,7 +176,6 @@ class ViewController: UIViewController {
         view.backgroundColor = .white
         setupHierarchy()
         setupLayout()
-//                self.bruteForce(passwordToUnlock: "1!gr")
     }
     
     //MARK: - Setup
@@ -178,6 +186,7 @@ class ViewController: UIViewController {
         view.addSubview(resetButton)
         view.addSubview(textField)
         view.addSubview(label)
+        view.addSubview(passwordActivityIndicator)
     }
     
     private func setupLayout() {
@@ -194,6 +203,11 @@ class ViewController: UIViewController {
             make.top.equalTo(textField.snp.bottom).offset(50)
             make.left.equalTo(view.snp.left).offset(50)
             make.right.equalTo(view.snp.right).offset(-50)
+        }
+        
+        passwordActivityIndicator.snp.makeConstraints { make in
+            make.centerX.equalTo(view.snp.centerX)
+            make.top.equalTo(label.snp.bottom).offset(50)
         }
         
         changeColorButton.snp.makeConstraints { make in
