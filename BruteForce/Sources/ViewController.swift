@@ -54,6 +54,9 @@ class ViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Change Color", for: .normal)
         button.tintColor = .black
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 20
+        
         
         button.addTarget(self, action: #selector(changeTheme), for: .touchUpInside)
         return button
@@ -63,6 +66,8 @@ class ViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Start", for: .normal)
         button.tintColor = .black
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 20
         
         button.addTarget(self, action: #selector(startBruteForce), for: .touchUpInside)
         return button
@@ -84,6 +89,8 @@ class ViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Reset", for: .normal)
         button.tintColor = .black
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 20
         
         button.addTarget(self, action: #selector(resetButtonPressed), for: .touchUpInside)
         return button
@@ -93,7 +100,7 @@ class ViewController: UIViewController {
         let textField = UITextField()
         textField.isSecureTextEntry = true
         textField.attributedPlaceholder = NSAttributedString(
-            string: "Type your text here",
+            string: "Type your password here",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         textField.textAlignment = .center
         textField.layer.borderWidth = 0.5
@@ -149,7 +156,7 @@ class ViewController: UIViewController {
     }
     
     @objc private func resetButtonPressed() {
-        passwordLabel.text = ""
+        passwordLabel.text = "Let's hack your password"
         passwordLabel.textColor = .black
         passwordTextField.isSecureTextEntry = true
         passwordTextField.text = ""
@@ -170,6 +177,21 @@ class ViewController: UIViewController {
             
         }))
         self.present(alert, animated: true)
+    }
+    
+    private func showNotEmptyTextFieldAlert() {
+        let alert = UIAlertController(
+            title: "Text Field isn't empty",
+            message: "Tap on "+"Reset"+" button before start hacking",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .default))
+        alert.addAction(UIAlertAction(title: "Reset", style: .default, handler: { [self] event in
+            passwordTextField.text = ""
+            passwordTextField.isSecureTextEntry = true
+        }))
+                      
+                        
     }
     
     //MARK: - BruteForce methods
