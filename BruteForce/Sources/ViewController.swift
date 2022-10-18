@@ -100,7 +100,9 @@ class ViewController: UIViewController {
     }()
     
     private lazy var changeColorStartResetButtonsStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [changeColorButton, startBruteForceButton, resetButton])
+        let stack = UIStackView(arrangedSubviews: [changeColorButton,
+                                                   startBruteForceButton,
+                                                   resetButton])
         stack.axis = .horizontal
         stack.spacing = 10
         stack.distribution = .fillEqually
