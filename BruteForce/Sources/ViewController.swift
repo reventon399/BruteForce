@@ -18,32 +18,34 @@ class ViewController: UIViewController {
     
     private var isBlack: Bool = false {
         didSet {
-            if isBlack {
-                view.backgroundColor = .black
-                passwordLabel.textColor = .white
-                changeColorButton.tintColor = .white
-                startBruteForceButton.tintColor = .white
-                stopBruteForceButton.tintColor = .white
-                resetButton.tintColor = .white
-                passwordActivityIndicator.color = .white
-                passwordTextField.textColor = .white
-                passwordTextField.layer.borderColor = whiteTextFieldBorderColor.cgColor
-                passwordTextField.attributedPlaceholder = NSAttributedString(
-                    string: "Type your text here",
-                    attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
-            } else {
-                view.backgroundColor = .white
-                passwordLabel.textColor = .black
-                changeColorButton.tintColor = .black
-                startBruteForceButton.tintColor = .black
-                stopBruteForceButton.tintColor = .black
-                resetButton.tintColor = .black
-                passwordActivityIndicator.color = .black
-                passwordTextField.textColor = .black
-                passwordTextField.layer.borderColor = blackTextFieldBorderColor.cgColor
-                passwordTextField.attributedPlaceholder = NSAttributedString(
-                    string: "Type your text here",
-                    attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
+            DispatchQueue.main.async { [self] in
+                if isBlack {
+                    view.backgroundColor = .black
+                    passwordLabel.textColor = .white
+                    changeColorButton.tintColor = .white
+                    startBruteForceButton.tintColor = .white
+                    stopBruteForceButton.tintColor = .white
+                    resetButton.tintColor = .white
+                    passwordActivityIndicator.color = .white
+                    passwordTextField.textColor = .white
+                    passwordTextField.layer.borderColor = whiteTextFieldBorderColor.cgColor
+                    passwordTextField.attributedPlaceholder = NSAttributedString(
+                        string: "Type your password here",
+                        attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+                } else {
+                    view.backgroundColor = .white
+                    passwordLabel.textColor = .black
+                    changeColorButton.tintColor = .black
+                    startBruteForceButton.tintColor = .black
+                    stopBruteForceButton.tintColor = .black
+                    resetButton.tintColor = .black
+                    passwordActivityIndicator.color = .black
+                    passwordTextField.textColor = .black
+                    passwordTextField.layer.borderColor = blackTextFieldBorderColor.cgColor
+                    passwordTextField.attributedPlaceholder = NSAttributedString(
+                        string: "Type your password here",
+                        attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
+                }
             }
         }
     }
@@ -54,6 +56,9 @@ class ViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Change Color", for: .normal)
         button.tintColor = .black
+        button.backgroundColor = .systemGray
+        button.layer.cornerRadius = 20
+        
         
         button.addTarget(self, action: #selector(changeTheme), for: .touchUpInside)
         return button
@@ -63,6 +68,8 @@ class ViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Start", for: .normal)
         button.tintColor = .black
+        button.backgroundColor = .systemGreen
+        button.layer.cornerRadius = 20
         
         button.addTarget(self, action: #selector(startBruteForce), for: .touchUpInside)
         return button
@@ -82,18 +89,31 @@ class ViewController: UIViewController {
     
     private lazy var resetButton: UIButton = {
         let button = UIButton(type: .system)
+        button.isEnabled = false
         button.setTitle("Reset", for: .normal)
         button.tintColor = .black
+        button.backgroundColor = .systemGray
+        button.layer.cornerRadius = 20
         
         button.addTarget(self, action: #selector(resetButtonPressed), for: .touchUpInside)
         return button
+    }()
+    
+    private lazy var changeColorStartResetButtonsStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [changeColorButton,
+                                                   startBruteForceButton,
+                                                   resetButton])
+        stack.axis = .horizontal
+        stack.spacing = 10
+        stack.distribution = .fillEqually
+        return stack
     }()
     
     private lazy var passwordTextField: UITextField = {
         let textField = UITextField()
         textField.isSecureTextEntry = true
         textField.attributedPlaceholder = NSAttributedString(
-            string: "Type your text here",
+            string: "Type your password here",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.black])
         textField.textAlignment = .center
         textField.layer.borderWidth = 0.5
@@ -120,28 +140,33 @@ class ViewController: UIViewController {
     //MARK: - Buttons Actions
     
     @objc private func changeTheme() {
-        isBlack.toggle()
+        DispatchQueue.main.async { [self] in
+            isBlack.toggle()
+        }
     }
     
     @objc private func startBruteForce() {
-            if passwordTextField.text == "" {
-                showEmptyTextFieldAlert()
-            } else {
-                guard let password = passwordTextField.text else { return }
-                let queue = DispatchQueue(
-                    label: "bruteForce",
-                    qos: .utility
-                )
-                queue.async {
-                    self.bruteForce(passwordToUnlock: password)
-                }
-                passwordActivityIndicator.startAnimating()
-                passwordActivityIndicator.isHidden = false
-                stopBruteForceButton.isHidden = false
+        if passwordTextField.text == "" {
+            showEmptyTextFieldAlert()
+        } else {
+            startBruteForceButton.isUserInteractionEnabled = false
+            passwordTextField.isUserInteractionEnabled = false
+            guard let password = passwordTextField.text else { return }
+            let queue = DispatchQueue(
+                label: "bruteForce",
+                qos: .background
+            )
+            queue.async {
+                self.bruteForce(passwordToUnlock: password)
             }
+            passwordActivityIndicator.startAnimating()
+            passwordActivityIndicator.isHidden = false
+            stopBruteForceButton.isHidden = false
+        }
     }
     
     @objc private func stopBruteForce() {
+        resetButton.isEnabled = true
         isBruteForceStopped = true
         passwordActivityIndicator.isHidden = true
         passwordActivityIndicator.stopAnimating()
@@ -149,8 +174,14 @@ class ViewController: UIViewController {
     }
     
     @objc private func resetButtonPressed() {
-        passwordLabel.text = ""
-        passwordLabel.textColor = .black
+        if view.backgroundColor == .black {
+            passwordLabel.textColor = .white
+        } else {
+            passwordLabel.textColor = .black
+        }
+        startBruteForceButton.isUserInteractionEnabled = true
+        passwordTextField.isUserInteractionEnabled = true
+        passwordLabel.text = "Let's hack your password"
         passwordTextField.isSecureTextEntry = true
         passwordTextField.text = ""
         passwordActivityIndicator.isHidden = true
@@ -160,7 +191,7 @@ class ViewController: UIViewController {
     
     //MARK: - Alert
     
-   private func showEmptyTextFieldAlert() {
+    private func showEmptyTextFieldAlert() {
         let alert = UIAlertController(
             title: "Empty Text Field",
             message: "Write your password in text field for correct working of this app",
@@ -170,6 +201,21 @@ class ViewController: UIViewController {
             
         }))
         self.present(alert, animated: true)
+    }
+    
+    private func showNotEmptyTextFieldAlert() {
+        let alert = UIAlertController(
+            title: "Text Field isn't empty",
+            message: "Tap on "+"Reset"+" button before start hacking",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: .default))
+        alert.addAction(UIAlertAction(title: "Reset", style: .default, handler: { [self] event in
+            isBruteForceStopped = true
+            stopBruteForceButton.isHidden = true
+            passwordTextField.text = ""
+            passwordTextField.isSecureTextEntry = true
+        }))
     }
     
     //MARK: - BruteForce methods
@@ -200,7 +246,10 @@ class ViewController: UIViewController {
     
     private func changeInterface(password: String, isSucceded: Bool) {
         if isSucceded {
-            let successText = "Your password is: \(password)"
+            let successText = """
+            Your password is: \(password)
+            Press "Reset" to check another password
+            """
             passwordLabel.text = successText
             passwordLabel.textColor = .systemGreen
             passwordTextField.isSecureTextEntry = false
@@ -208,7 +257,10 @@ class ViewController: UIViewController {
             passwordActivityIndicator.stopAnimating()
             stopBruteForceButton.isHidden = true
         } else {
-            let failureText = "Your password: \(password) wasn't hacked"
+            let failureText = """
+            Your password: \(password) wasn't hacked.
+            Press "Reset" to check another password
+            """
             passwordLabel.text = failureText
             passwordLabel.textColor = .systemRed
             passwordTextField.isSecureTextEntry = false
@@ -251,17 +303,14 @@ class ViewController: UIViewController {
     //MARK: - Setup
     
     private func setupHierarchy() {
-        view.addSubview(changeColorButton)
-        view.addSubview(startBruteForceButton)
-        view.addSubview(resetButton)
         view.addSubview(passwordTextField)
         view.addSubview(passwordLabel)
         view.addSubview(passwordActivityIndicator)
         view.addSubview(stopBruteForceButton)
+        view.addSubview(changeColorStartResetButtonsStack)
     }
     
     private func setupLayout() {
-        
         passwordTextField.snp.makeConstraints { make in
             make.centerY.equalTo(view.snp.centerY).offset(-150)
             make.left.equalTo(view.snp.left).offset(20)
@@ -281,10 +330,10 @@ class ViewController: UIViewController {
             make.top.equalTo(passwordLabel.snp.bottom).offset(50)
         }
         
-        changeColorButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom).offset(-20)
+        changeColorStartResetButtonsStack.snp.makeConstraints { make in
             make.left.equalTo(view.snp.left).offset(20)
-            make.width.equalTo(100)
+            make.right.equalTo(view.snp.right).offset(-20)
+            make.bottom.equalTo(view.snp.bottom).offset(-20)
             make.height.equalTo(50)
         }
         
@@ -292,20 +341,6 @@ class ViewController: UIViewController {
             make.top.equalTo(passwordActivityIndicator.snp.bottom).offset(50)
             make.left.equalTo(view.snp.left).offset(20)
             make.right.equalTo(view.snp.right).offset(-20)
-            make.height.equalTo(50)
-        }
-        
-        startBruteForceButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom).offset(-20)
-            make.left.equalTo(changeColorButton.snp.right).offset(20)
-            make.width.equalTo(100)
-            make.height.equalTo(50)
-        }
-        
-        resetButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom).offset(-20)
-            make.left.equalTo(startBruteForceButton.snp.right).offset(20)
-            make.width.equalTo(100)
             make.height.equalTo(50)
         }
     }
