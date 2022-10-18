@@ -56,7 +56,7 @@ class ViewController: UIViewController {
         let button = UIButton(type: .system)
         button.setTitle("Change Color", for: .normal)
         button.tintColor = .black
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = .systemGray
         button.layer.cornerRadius = 20
         
         
@@ -92,11 +92,20 @@ class ViewController: UIViewController {
         button.isEnabled = false
         button.setTitle("Reset", for: .normal)
         button.tintColor = .black
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = .systemGray
         button.layer.cornerRadius = 20
         
         button.addTarget(self, action: #selector(resetButtonPressed), for: .touchUpInside)
         return button
+    }()
+    
+    private lazy var changeColorStartResetButtonsStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [changeColorButton, startBruteForceButton, resetButton])
+        stack.axis = .horizontal
+        stack.spacing = 10
+//        stack.alignment = .center
+        stack.distribution = .fillEqually
+        return stack
     }()
     
     private lazy var passwordTextField: UITextField = {
@@ -164,10 +173,14 @@ class ViewController: UIViewController {
     }
     
     @objc private func resetButtonPressed() {
+        if view.backgroundColor == .black {
+            passwordLabel.textColor = .white
+        } else {
+            passwordLabel.textColor = .black
+        }
         startBruteForceButton.isUserInteractionEnabled = true
         passwordTextField.isUserInteractionEnabled = true
         passwordLabel.text = "Let's hack your password"
-        passwordLabel.textColor = .black
         passwordTextField.isSecureTextEntry = true
         passwordTextField.text = ""
         passwordActivityIndicator.isHidden = true
@@ -291,13 +304,14 @@ class ViewController: UIViewController {
     //MARK: - Setup
     
     private func setupHierarchy() {
-        view.addSubview(changeColorButton)
-        view.addSubview(startBruteForceButton)
-        view.addSubview(resetButton)
+//        view.addSubview(changeColorButton)
+//        view.addSubview(startBruteForceButton)
+//        view.addSubview(resetButton)
         view.addSubview(passwordTextField)
         view.addSubview(passwordLabel)
         view.addSubview(passwordActivityIndicator)
         view.addSubview(stopBruteForceButton)
+        view.addSubview(changeColorStartResetButtonsStack)
     }
     
     private func setupLayout() {
@@ -320,12 +334,19 @@ class ViewController: UIViewController {
             make.top.equalTo(passwordLabel.snp.bottom).offset(50)
         }
         
-        changeColorButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom).offset(-20)
+        changeColorStartResetButtonsStack.snp.makeConstraints { make in
             make.left.equalTo(view.snp.left).offset(20)
-            make.width.equalTo(100)
+            make.right.equalTo(view.snp.right).offset(-20)
+            make.bottom.equalTo(view.snp.bottom).offset(-20)
             make.height.equalTo(50)
         }
+        
+//        changeColorButton.snp.makeConstraints { make in
+//            make.bottom.equalTo(view.snp.bottom).offset(-20)
+//            make.left.equalTo(view.snp.left).offset(20)
+//            make.width.equalTo(100)
+//            make.height.equalTo(50)
+//        }
         
         stopBruteForceButton.snp.makeConstraints { make in
             make.top.equalTo(passwordActivityIndicator.snp.bottom).offset(50)
@@ -334,19 +355,19 @@ class ViewController: UIViewController {
             make.height.equalTo(50)
         }
         
-        startBruteForceButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom).offset(-20)
-            make.left.equalTo(changeColorButton.snp.right).offset(20)
-            make.width.equalTo(100)
-            make.height.equalTo(50)
-        }
+//        startBruteForceButton.snp.makeConstraints { make in
+//            make.bottom.equalTo(view.snp.bottom).offset(-20)
+//            make.left.equalTo(changeColorButton.snp.right).offset(20)
+//            make.width.equalTo(100)
+//            make.height.equalTo(50)
+//        }
         
-        resetButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.snp.bottom).offset(-20)
-            make.left.equalTo(startBruteForceButton.snp.right).offset(20)
-            make.width.equalTo(100)
-            make.height.equalTo(50)
-        }
+//        resetButton.snp.makeConstraints { make in
+//            make.bottom.equalTo(view.snp.bottom).offset(-20)
+//            make.left.equalTo(startBruteForceButton.snp.right).offset(20)
+//            make.width.equalTo(100)
+//            make.height.equalTo(50)
+//        }
     }
 }
 
